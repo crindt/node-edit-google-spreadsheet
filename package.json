@@ -1,13 +1,14 @@
 {
   "name": "edit-google-spreadsheet",
-  "version": "0.2.2",
+  "version": "0.2.12",
   "dependencies": {
     "colors": "~0.6.0-1",
     "googleclientlogin": "~0.2.6",
     "lodash": "~1.2.1",
     "request": "~2.21.0",
     "google-oauth-jwt": "0.0.4",
-    "async": "~0.2.9"
+    "async": "~0.2.9",
+    "xml2json": "~0.4.0"
   },
-  "repository":"git://github.com/jpillora/node-edit-google-spreadsheet.git"
+  "repository": "git://github.com/jpillora/node-edit-google-spreadsheet.git"
 }

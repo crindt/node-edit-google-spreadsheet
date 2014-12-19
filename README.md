@@ -1,6 +1,6 @@
-## Node - Edit Google Spreadsheet
+## Edit Google Spreadsheet
 
-> A simple API for reading and writing to Google Spreadsheets
+> A simple API for reading and writing Google Spreadsheets in Node.js
 
 [![NPM version](https://nodei.co/npm/edit-google-spreadsheet.png?compact=true)](https://npmjs.org/package/edit-google-spreadsheet)
 
@@ -11,40 +11,35 @@ npm install edit-google-spreadsheet
 
 #### Basic Usage
 
-Create sheet with client login:
+Load a spreadsheet:
 
 ``` js
   var Spreadsheet = require('edit-google-spreadsheet');
 
-  Spreadsheet.create({
+  Spreadsheet.load({
     debug: true,
-    username: '...',
-    password: '...',
     spreadsheetName: 'node-edit-spreadsheet',
     worksheetName: 'Sheet1',
-    callback: sheetReady
+    // Choose from 1 of the 3 authentication methods:
+    //    1. Username and Password
+    username: 'my-name@google.email.com',
+    password: 'my-5uper-t0p-secret-password',
+    // OR 2. OAuth
+    oauth : {
+      email: 'my-name@google.email.com',
+      keyFile: 'my-private-key.pem'
+    },
+    // OR 3. Token
+    accessToken : {
+      type: 'Bearer',
+      token: 'my-generated-token'
+    }
+  }, function sheetReady(err, spreadsheet) {
+    //use speadsheet!
   });
-
 ```
 
 *Note: Using the options `spreadsheetName` and `worksheetName` will cause lookups for `spreadsheetId` and `worksheetId`. Use `spreadsheetId` and `worksheetId` for improved performance.*
-
-Create sheet with OAuth:
-
-``` js
-  var Spreadsheet = require('edit-google-spreadsheet');
-
-  Spreadsheet.create({
-    debug: true,
-    oauth : {
-      email: 'some-id@developer.gserviceaccount.com',
-      keyFile: 'private-key.pem'
-    },
-    spreadsheetName: 'node-edit-spreadsheet',
-    worksheetName: 'Sheet1',
-    callback: sheetReady
-  });
-```
 
 Update sheet:
 
@@ -154,7 +149,7 @@ spreadsheet.add({
 #### API
 
 
-##### `Spreadsheet.create( options )`
+##### `Spreadsheet.load( options, callback( err, spreadsheet ) )`
 
 See [Options](https://github.com/jpillora/node-edit-google-spreadsheet#options) below
 
@@ -166,7 +161,7 @@ Sends off the batch of `add()`ed cells. Clears all cells once complete.
 
 `options.autoSize` When required, increase the worksheet size (rows and columns) in order to fit the batch (default `false`).
 
-##### spreadsheet.`receive( callback( err , rows , info ) )`
+##### spreadsheet.`receive( [options,] callback( err , rows , info ) )`
 Recieves the entire spreadsheet. The `rows` object is an object in the same format as the cells you `add()`, so `add(rows)` will be valid. The `info` object looks like:
 
 ```
@@ -183,12 +178,18 @@ Recieves the entire spreadsheet. The `rows` object is an object in the same form
 }
 ```
 
+`options.getValues` Always get the values (results) of forumla cells.
+
 ##### spreadsheet.`metadata( [data, ] callback )`
 
 Get and set metadata
 
 *Note: when setting new metadata, if `rowCount` and/or `colCount` is left out,
 an extra request will be made to retrieve the missing data.*
+
+##### spreadsheet.`raw`
+
+The raw data recieved from Google when enumerating the spreedsheet and worksheet lists, *which are triggered when searching for IDs*. In order to see this array of all spreadsheets (`raw.spreadsheets`) the `spreadsheetName` option must be used. Similarly for worksheets (`raw.worksheets`), the `worksheetName` options must be used.
 
 #### Options
 
@@ -204,14 +205,20 @@ Google account - *Be careful about committing these to public repos*.
 ##### `oauth`
 OAuth configuration object. See [google-oauth-jwt](https://github.com/extrabacon/google-oauth-jwt#specifying-options). *By default `oauth.scopes` is set to `['https://spreadsheets.google.com/feeds']` (`https` if `useHTTPS`)*
 
-##### `spreadSheetName` `spreadsheetId`
+##### `accessToken`
+Reuse a generated access `token` of the given `type`. If you set `accessToken` to an object, reauthentications will not work. Instead use a `function accessToken(callback(err, token)) { ... }` function, to allow token generation when required.
+
+##### `spreadsheetName` `spreadsheetId`
 The spreadsheet you wish to edit. Either the Name or Id is required.
 
-##### `workSheetName` `worksheetId`
+##### `worksheetName` `worksheetId`
 The worksheet you wish to edit. Either the Name or Id is required.
 
 ##### `useHTTPS`
 Whether to use `https` when connecting to Google (default: `true`)
+
+##### `useCellTextValues`
+Return text values for cells or return values as typed. (default: `true`)
 
 #### Todo
 
@@ -233,3 +240,29 @@ Thanks to `googleclientlogin` for easy Google API ClientLogin Tokens
 * https://developers.google.com/google-apps/spreadsheets/
 * https://developers.google.com/google-apps/documents-list/
 
+#### Donate
+
+BTC 1AxEWoz121JSC3rV8e9MkaN9GAc5Jxvs4
+
+#### MIT License
+
+Copyright © 2014 Jaime Pillora &lt;dev@jpillora.com&gt;
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

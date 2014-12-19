@@ -1,18 +1,17 @@
 var Spreadsheet = require('../');
 var creds = require('./cred-loader');
 
-Spreadsheet.create({
+Spreadsheet.load({
   debug: true,
   username: creds.username,
   password: creds.password,
   spreadsheetName: 'node-edit-spreadsheet',
   worksheetName: 'Sheet1',
   // spreadsheetId: 'ttFmrFPIipJimDQYSFyhwTg',
-  // worksheetId: "od6",
-  callback: run
-});
+  // worksheetId: "od6"
+}, function run(err, spreadsheet) {
+  if(err) throw err;
 
-function run(err, spreadsheet) {
   spreadsheet.add({
     3: {
       4: { name: "a", val: 42 }, //'42' though tagged as "a"
@@ -25,4 +24,5 @@ function run(err, spreadsheet) {
     if(err) throw err;
     console.log("Cells updated");
   });
-}
+});
+
